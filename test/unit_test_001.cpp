@@ -47,7 +47,7 @@ unittest(test_constants)
 
 unittest(test_begin)
 {
-  AD5231 pot = AD5231(10, 12, 13);  //  HW SPI by default
+  AD5231 pot = AD5231(10, 12);  //  HW SPI by default
   pot.begin();
   assertEqual(512, pot.getValue(0));
 
@@ -58,7 +58,7 @@ unittest(test_begin)
 
 unittest(test_setValue)
 {
-  AD5235 pot = AD5235(10, 12, 13);  //  HW SPI by default
+  AD5235 pot = AD5235(10, 12);  //  HW SPI by default
   pot.begin();
   assertEqual(512, pot.getValue(0));
 
@@ -101,7 +101,7 @@ unittest(test_setPercentage)
 
 unittest(test_reset)
 {
-  AD5235 pot = AD5235(10, 12, 13);  //  HW SPI by default
+  AD5235 pot = AD5235(10, 12);  //  HW SPI by default
   pot.begin();
   assertEqual(512, pot.getValue(0));
 
@@ -115,11 +115,11 @@ unittest(test_reset)
 
 unittest(test_pm_count_HARDWARE_SPI)
 {
-  AD5231 pot1 = AD5231(10, 12, 13);  //  HW SPI by default
+  AD5231 pot1 = AD5231(10, 12);  //  HW SPI by default
   pot1.begin();
   assertEqual(1, pot1.pmCount());
 
-  AD5235 pot2 = AD5235(10, 12, 13);
+  AD5235 pot2 = AD5235(10, 12);
   pot2.begin();
   assertEqual(2, pot2.pmCount());
 }
