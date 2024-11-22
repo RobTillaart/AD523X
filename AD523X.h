@@ -89,7 +89,7 @@ protected:
   bool     _hwSPI;
   uint32_t _SPIspeed = 16000000;
 
-  uint16_t _value[2];
+  uint16_t _value[2] = {0, 0 };
   uint8_t  _pmCount = 2;
 
   uint32_t updateDevice(uint8_t pm, uint16_t value);

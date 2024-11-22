@@ -133,9 +133,9 @@ bool AD523X::setPercentage(uint8_t pm, float percentage)
 float AD523X::getPercentage(uint8_t pm)
 {
   if (pm >= _pmCount) return 0;
-  uint8_t v = _value[pm];
-  if (v == 0) return 0.0;
-  return (100.0 / 1023.0) * v;
+  uint16_t value = _value[pm];
+  if (value == 0) return 0.0;
+  return (100.0 / 1023.0) * value;
 }
 
 bool AD523X::setPercentageAll(float percentage)
