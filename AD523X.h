@@ -62,7 +62,7 @@ public:
   //  void     incrementOne(uint8_t pm = 0);
 
   //       EEMEM
-  uint32_t NOP();  //  needed by some commands.
+  uint32_t rawRead();  //  needed by some commands.
   //  load wiper position from eemem
   void     loadWiperEEMEM(uint8_t pm = 0);
   //  store current wiper position.

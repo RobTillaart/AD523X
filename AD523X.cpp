@@ -228,7 +228,7 @@ bool AD523X::usesHWSPI()
 //
 
 //  command #0
-uint32_t AD523X::NOP()
+uint32_t AD523X::rawRead()
 {
   return updateDevice(0x00, 0x0000);
 }
@@ -238,7 +238,7 @@ void AD523X::loadWiperEEMEM(uint8_t pm)
 {
   uint8_t cmd = 0x10 | pm;
   updateDevice(cmd, 0x0000);
-  NOP();
+  rawRead();
 }
 
 //  command #2
@@ -253,7 +253,7 @@ uint16_t AD523X::loadEEMEM(uint8_t address)
 {
   uint8_t cmd = 0x90 | address;
   updateDevice(cmd, 0x0000);
-  return NOP() & 0xFFFF;   //  P23 - AD5235
+  return rawRead() & 0xFFFF;   //  P23 - AD5235
 }
 
 //  command #3

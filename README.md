@@ -123,7 +123,7 @@ Commented in the code as effect on the cached values is to be investigated.
 
 ### EEMEM
 
-- **uint32_t NOP()** needed by commands to read a value from the device.
+- **uint32_t rawRead()** needed by commands to read a value from the device.
 Returns normally the last command.
 - **void loadWiperEEMEM(uint8_t pm = 0)** load wiper position from eemem
 - **void storeWiperEEMEM(uint8_t pm = 0)** store current wiper position as power on reset.
@@ -133,6 +133,7 @@ Returns normally the last command.
   - store address 1 from value iso wiper position (AD5235)
   - store address 1 from value to write O1, O2    (AD5231) Page 8, datasheet
 
+Note: address should be 0..15 (code does not check).
 Note: the WP pin allows to write protect EEMEM  
 Note: Writing to EEMEM can block up to **25 milliseconds**.  
 More see page 14 datasheet.
