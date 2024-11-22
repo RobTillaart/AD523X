@@ -4,7 +4,7 @@
 //  AUTHOR: Rob Tillaart
 //    DATE: 2024-11-21
 // VERSION: 0.1.0
-// PURPOSE: Arduino library for SPI AD5231 and AD5235 digital potentiometers.
+// PURPOSE: Arduino library for SPI AD5231 and AD5235 10 bit digital potentiometers.
 //     URL: https://github.com/RobTillaart/AD523X
 
 
@@ -14,9 +14,9 @@
 
 #define AD523X_LIB_VERSION              (F("0.1.0"))
 
-#ifndef AD523X_MIDDLE_VALUE
 #define AD523X_MIDDLE_VALUE             512
-#endif
+#define AD523X_MAX_VALUE                1023
+
 
 
 #ifndef __SPI_CLASS__
@@ -41,53 +41,44 @@ public:
 
   void     begin(uint16_t value = AD523X_MIDDLE_VALUE);
   void     reset(uint16_t value = AD523X_MIDDLE_VALUE);
-
-  //  SINGLE CHANNEL
-  bool     setValue(uint8_t pm = 0, uint16_t value = AD523X_MIDDLE_VALUE);
-  uint16_t getValue(uint8_t pm = 0);
-  bool     setPercentage(uint8_t pm = 0, float percentage = 50);
-  float    getPercentage(uint8_t pm = 0);
-
-  //  DUAL CHANNEL AD5235 only TODO move?
-  bool     setAll(uint16_t value);
-  bool     setPercentageAll(float percentage = 0);
-
-  //  incr/decr interface here TODO
-  
-
-  //       SPI - speed in Hz
-  void     setSPIspeed(uint32_t speed);
-  uint32_t getSPIspeed();
-  bool     usesHWSPI();
-
-  //       MISC
+  void     resetDevice();
   uint8_t  pmCount();
 
+  //  VALUE
+  bool     setValue(uint16_t value);
+  bool     setValue(uint8_t pm, uint16_t value);
+  uint16_t getValue(uint8_t pm);
+  bool     setAll(uint16_t value);  //  DUAL only
 
-  //  TODO include in readme.md
+  //  PERCENTAGE
+  bool     setPercentage(uint8_t pm, float percentage);
+  float    getPercentage(uint8_t pm);
+  bool     setPercentageAll(float percentage);
+
+  //  incr/decr interface here TODO
+  //  void     decrement6DB(uint8_t pm = 0);
+  //  void     decrementOne(uint8_t pm = 0);
+  //  void     increment6DB(uint8_t pm = 0);
+  //  void     incrementOne(uint8_t pm = 0);
 
   //       EEMEM
-  void     NOP();  //  needed by some commands.
-  
+  uint32_t NOP();  //  needed by some commands.
+  //  load wiper position from eemem
   void     loadWiperEEMEM(uint8_t pm = 0);
   //  store current wiper position.
   void     storeWiperEEMEM(uint8_t pm = 0);
-
-  uint16_t     loadEEMEM(uint8_t address, uint16_t value);
+  //  load previous stored value from eemem
+  uint16_t loadEEMEM(uint8_t address);
   //  store address 0 from value iso wiper position (AD5231/5)
   //  store address 1 from value iso wiper position (AD5235)
   //  store address 1 from value to write O1, O2    (AD5231) P08
   void     storeEEMEM(uint8_t address, uint16_t value);
 
 
-  void     reset();
-
-  //  incr/decr interface
-  //  void     decrement6DB(uint8_t pm = 0);
-  //  void     decrementOne(uint8_t pm = 0);
-  //  void     increment6DB(uint8_t pm = 0);
-  //  void     incrementOne(uint8_t pm = 0);
-
+  //       SPI - speed in Hz
+  void     setSPIspeed(uint32_t speed);
+  uint32_t getSPIspeed();
+  bool     usesHWSPI();
 
 protected:
   uint8_t  _dataIn;
@@ -101,8 +92,8 @@ protected:
   uint16_t _value[2];
   uint8_t  _pmCount = 2;
 
-  void     updateDevice(uint8_t pm, uint16_t value);
-  void     swSPI_transfer(uint8_t value);
+  uint32_t updateDevice(uint8_t pm, uint16_t value);
+  uint8_t  swSPI_transfer(uint8_t value);
 
   __SPI_CLASS__ * _mySPI;
   SPISettings   _spi_settings;

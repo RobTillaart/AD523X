@@ -11,7 +11,7 @@ uint32_t start, stop;
 
 
 //  select, reset, dataIn, dataOut, clock == SOFTWARE SPI
-//  AD5231 pot(10, 255, 255, 8, 9);
+//  AD5231 pot(10, 255, 7, 8, 9);
 
 //  select, reset, &SPI === HW SPI UNO clock = 13, data = 11
 AD5231 pot = AD5231(6, 7, &SPI);
@@ -104,10 +104,10 @@ void test_timing()
   start = micros();
   for (int i = 0; i < 1000; i++)
   {
-    pot.setValue(0, i);
+    pot.setValue(i);
   }
   stop = micros();
-  Serial.print("1000 x setValue():\t");
+  Serial.print("1000 x setValue(value):\t");
   Serial.println(stop - start);
   delay(10);
 

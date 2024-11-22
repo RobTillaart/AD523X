@@ -11,21 +11,39 @@
 
 # AD523X
 
-Arduino library for SPI AD5231 and AD5235 digital potentiometers
+Arduino library for SPI AD5231 and AD5235 10 bit digital potentiometers.
 
 ## Description
 
 **Experimental**
 
-The library is experimental as the functionality is not tested yet.
+The library is experimental as the functionality is not tested with hardware yet.
 
-The **AD5231** is a single channel 1024 step, SPI based potentiometer, 
-the **AD5235** is a dual version thereof.
+The **AD5231** is a single channel, 10 bit = 1024 step, SPI based potentiometer, 
+the **AD5235** is a dual channel version.
 
-The interface is straightforward, one can set a value per channels between 0..1023.
+This library is written as it is the first 10 bit potentiometer encountered.
+When used as a voltage divider one could set 5V in steps of 5 mV which is great.
 
+The interface is straightforward, one can set a value per channels between 0..1023
+or by means of a percentage. This value can be fetched from cache.
+
+Furthermore the power on reset start value can be set in EEMEM (EEPROM), either by 
+copying the current position or by writing an explicit value to the EEMEM address.
+
+Finally there are 14 or so free addresses in EEMEM to store some 16 bit values.
+
+The library does not support the **WP = writeProtect pin** or the **RDY = ready pin**.
+This might change in the future.
+
+The library doen not implement the increment/decrement interface yet.
+This might change in the future.
+
+Feedback is as always welcome! please open an issue on GitHub.
 
 #### Related
+
+Mostly digipots:
 
 - https://github.com/RobTillaart/AD520X
 - https://github.com/RobTillaart/AD523X
@@ -45,51 +63,79 @@ The interface is straightforward, one can set a value per channels between 0..10
 
 ### Constructors
 
-- **AD5231(uint8_t select, uint8_t reset, uint8_t shutdown, SPIClassRP2040 \* mySPI = &SPI)** constructor HW SPI (RP2040 specific)
-- **AD5231(uint8_t select, uint8_t reset, uint8_t shutdown, SPIClass \* mySPI = &SPI)** constructor HW SPI
-- **AD5231(uint8_t select, uint8_t reset, uint8_t shutdown, uint8_t dataOut, uint8_t clock)** constructor SW SPI
+- **AD5231(uint8_t select, uint8_t reset, SPIClassRP2040 \* mySPI = &SPI)** constructor HW SPI (RP2040 specific)
+- **AD5231(uint8_t select, uint8_t reset, SPIClass \* mySPI = &SPI)** constructor HW SPI
+- **AD5231(uint8_t select, uint8_t reset, uint8_t dataIn, uint8_t dataOut, uint8_t clock)** constructor SW SPI
 
 
-- **AD5235(uint8_t select, uint8_t reset, uint8_t shutdown, SPIClassRP2040 \* mySPI = &SPI)** constructor HW SPI (RP2040 specific)
-- **AD5235(uint8_t select, uint8_t reset, uint8_t shutdown, SPIClass \* mySPI = &SPI)** constructor HW SPI
-- **AD5235(uint8_t select, uint8_t reset, uint8_t shutdown, uint8_t dataOut, uint8_t clock)** constructor SW SPI
+- **AD5235(uint8_t select, uint8_t reset, SPIClassRP2040 \* mySPI = &SPI)** constructor HW SPI (RP2040 specific)
+- **AD5235(uint8_t select, uint8_t reset, SPIClass \* mySPI = &SPI)** constructor HW SPI
+- **AD5235(uint8_t select, uint8_t reset, uint8_t dataIn, uint8_t dataOut, uint8_t clock)** constructor SW SPI
 
 Note: 
-- hardware SPI is 10+ times faster on an UNO than software SPI.
-- software SPI on ESP32 is about equally fast than hardware SPI.
-
+- hardware SPI is about 10+ times faster on an UNO as software SPI.
+- software SPI on ESP32 is about equally fast as hardware SPI.
 
 ### Base
 
-- **void begin(uint8_t value = 512)** value is the initial value of all potentiometer.
-- **void reset(uint8_t value = 512)** resets the device and sets all potentiometers to value, default 512.
-
+- **void begin(uint8_t value = AD523X_MIDDLE_VALUE)** value is the initial value of all potentiometer.
+- **void reset(uint8_t value = AD523X_MIDDLE_VALUE)** resets the device and sets all potentiometers to value, default 512.
+- **void resetDevice()** execute a power on reset.  
+WARNING: This will probably corrupt the internal cache for getValue.
+- **uint8_t pmCount()** returns the number of internal potentiometers.
 
 ### Value
 
-- **bool setValue(uint8_t pm = 0, uint8_t value = 512)** set a potentiometer to a value. 
-Default value is middle value.  
+- **bool setValue(uint8_t value)** set a potentiometer to a value.
 Returns true if successful, false if not.
-- **bool setValue(uint8_t pmA, uint8_t pmB, uint8_t value)** set two potentiometers to same value.
-Note, no default value!
+- **bool setValue(uint8_t pm, uint8_t value)** set a potentiometer to a value. 
 Returns true if successful, false if not.
-- **void setAll(uint8_t value = 512)** set all potentiometers to the same value e.g. 0 or max or mid value.
-Can typically be used for **mute**.
-- **uint8_t getValue(uint8_t pm = 0)** returns the last set value of a specific potentiometer.
-
+- **uint8_t getValue(uint8_t pm)** returns the last set value of a specific potentiometer
+from cache. This will probably change in the future.
+- **void setAll(uint8_t value)** set all potentiometers to the same value 
+e.g. 0 or max or middle value.
+Can typically be used for **mute** or stereo setting.
 
 The library has defined **#define AD520X_MIDDLE_VALUE  512**
+The library has defined **#define AD520X_MAX_VALUE  1023**
+
+In the future **getValue()** might be reading from the device instead of from cache.
 
 
 ### Percentage
 
-- **bool setPercentage(uint8_t pm = 0, float percentage = 50)** similar to setValue, percentage from 0..100%, default potmeter 0 and 50%. 
+- **bool setPercentage(uint8_t pm, float percentage)** similar to setValue, 
+percentage from 0..100%.
 Returns true when successful, false if not.
-- **bool setPercentage(uint8_t pmA, uint8_t pmB, float percentage)** similar to setValue, percentage from 0..100%.
-Note, no default value.
+- **bool setPercentageAll(float percentage)** similar to setValue, 
+percentage from 0..100%, 
 Returns true when successful, false if not.
-- **float getPercentage(uint8_t pm = 0)** return the value of potentiometer pm as percentage.
+- **float getPercentage(uint8_t pm)** return the value of potentiometer pm as percentage.
 
+### Increment / decrement
+
+Commented in the code as effect on the cached values is to be investigated.
+
+- **void decrement6DB(uint8_t pm = 0)** not implemented yet.
+- **void decrementOne(uint8_t pm = 0)** not implemented yet.
+- **void increment6DB(uint8_t pm = 0)** not implemented yet.
+- **void incrementOne(uint8_t pm = 0)** not implemented yet.
+
+### EEMEM
+
+- **uint32_t NOP()** needed by commands to read a value from the device.
+Returns normally the last command.
+- **void loadWiperEEMEM(uint8_t pm = 0)** load wiper position from eemem
+- **void storeWiperEEMEM(uint8_t pm = 0)** store current wiper position as power on reset.
+- **uint16_t loadEEMEM(uint8_t address)** load previous stored value from eemem
+- **void storeEEMEM(uint8_t address, uint16_t value)** store value at address.
+  - store address 0 from value iso wiper position (AD5231/5)
+  - store address 1 from value iso wiper position (AD5235)
+  - store address 1 from value to write O1, O2    (AD5231) Page 8, datasheet
+
+Note: the WP pin allows to write protect EEMEM  
+Note: Writing to EEMEM can block up to **25 milliseconds**.  
+More see page 14 datasheet.
 
 ### Hardware SPI
 
@@ -100,56 +146,49 @@ Has no effect on software SPI.
 - **uint32_t getSPIspeed()** returns SPI transfer rate.
 - **bool usesHWSPI()** returns true / false depending on constructor.
 
-### Misc
-
-- **uint8_t pmCount()** returns the number of internal potentiometers.
-- **void powerOn()** switches the module on.
-- **void powerOff()** switches the module off.
-- **bool isPowerOn()** returns true if on (default) or false if off.
-
-
-### EEMEM
-
-
-TODO
-- **void storeEEMEM()** save current position as power on reset.
-
-- investigate EEMEM support
-  - WP and RDY signals. 25 ms.
-  - page 14 
-
 ### AD5231 specific
 
-TODO
+The O1 en O2 outputs can be set by writing to EEMEM at address 0x01.
 
-- investigate O1 en O2 outputs
+```cpp
+storeEEMEM(1, 0);  //  01 = 0,  02 = 0
+storeEEMEM(1, 1);  //  01 = 1,  02 = 0
+storeEEMEM(1, 2);  //  01 = 0,  02 = 1
+storeEEMEM(1, 3);  //  01 = 1,  02 = 1
+```
+
+To be verified with hardware.
+
+### AD5235 specific
+
+- dual channel functions.
 
 
 ## Future
-
 
 #### Must
 
 - improve documentation
 - get hardware to test
-- TODO's in code and documentation.
-
 
 #### Should
 
-- implement read back from device 
-  - SPI 
-  - commands.
+- TODO's in code and documentation.
+- fix the getValue() => remove cache?
+- move specific functions to AD5231/5 classes.
+- redo class hierarchy.
 - magic numbers (e.g. commands 0..15)
 
 #### Could
 
-- command nr 3 and 9 store/read from EEMEM(address).
 - optimize code
 - add error code
 - add parameter checking
 - extend unit tests
 - extent examples
+  - AD5235 as single potmeter with 2048 steps (series)
+  - AD5235 as single potmeter with 2x 1024 steps (parallel)
+- stereo functions for the AD5235
 
 #### Wont
 
