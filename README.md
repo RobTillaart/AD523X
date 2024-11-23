@@ -22,6 +22,8 @@ The library is experimental as the functionality is not tested with hardware yet
 The **AD5231** is a single channel, 10 bit = 1024 step, SPI based potentiometer, 
 the **AD5235** is a dual channel version.
 
+There are 10 kΩ, 50 kΩ, and 100 kΩ versions.
+
 This library is written as it is the first 10 bit potentiometer encountered.
 When used as a voltage divider one could set 5V in steps of 5 mV which is great.
 
@@ -36,7 +38,7 @@ Finally there are 14 or so free addresses in EEMEM to store some 16 bit values.
 The library does not support the **WP = writeProtect pin** or the **RDY = ready pin**.
 This might change in the future.
 
-The library doen not implement the increment/decrement interface yet.
+The library does not implement the increment/decrement interface yet.
 This might change in the future.
 
 Feedback is as always welcome! please open an issue on GitHub.
@@ -79,7 +81,8 @@ Note:
 ### Base
 
 - **void begin(uint8_t value = AD523X_MIDDLE_VALUE)** value is the initial value of all potentiometer.
-- **void reset(uint8_t value = AD523X_MIDDLE_VALUE)** resets the device and sets all potentiometers to value, default 512.
+- **void reset(uint8_t value = AD523X_MIDDLE_VALUE)** resets the device and sets all potentiometers 
+to value, default is 512.
 - **void resetDevice()** execute a power on reset.  
 WARNING: This will probably corrupt the internal cache for getValue.
 - **uint8_t pmCount()** returns the number of internal potentiometers.
@@ -187,7 +190,7 @@ To be verified with hardware.
 - add parameter checking
 - extend unit tests
 - extent examples
-  - AD5235 as single potmeter with 2048 steps (series)
+  - AD5235 as single potmeter with 2048 steps (series) TasO (two as one)
   - AD5235 as single potmeter with 2x 1024 steps (parallel)
 - stereo functions for the AD5235
 
